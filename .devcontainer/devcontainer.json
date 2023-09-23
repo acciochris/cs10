@@ -22,7 +22,7 @@
 
 	"customizations": {
 		"vscode": {
-			"extensions": ["kdarkhan.mips"]
+			"extensions": ["kdarkhan.mips", "roadkillco.dashmips-debugger"]
 		}
 	}
 }
