@@ -83,6 +83,51 @@ debug_integers:
     addi $sp, $sp, 12
     jr $ra
 
+# i ← 1
+# while i < length(A)
+#     x ← A[i]
+#     j ← i - 1
+#     while j >= 0 and A[j] >= x
+#         A[j+1] ← A[j]
+#         j ← j - 1
+#     end while
+#     A[j+1] ← x
+#     i ← i + 1
+# end while
+.macro load_addr(%i)
+    sll $t3, %i, 2
+    add $t4, $a0, $t3
+.end_macro
+insertion_sort:
+    li $t0, 1
+    
+    insertion_sort_outer_loop:
+    beq $t0, $a1, insertion_sort_ret
+    load_addr($t0)
+    lw $t1, 0($t4)
+    addi $t2, $t0, -1
+    
+    insertion_sort_inner_loop:
+    slti $t5, $t2, 0
+    bne $t5, $zero, insertion_sort_end_inner_loop
+    load_addr($t2)
+    lw $t6, 0($t4)
+    slt $t7, $t6, $t1
+    bne $t7, $zero, insertion_sort_end_inner_loop
+    sw $t6, 4($t4)
+    addi $t2, $t2, -1
+    j insertion_sort_inner_loop
+
+    insertion_sort_end_inner_loop:
+    load_addr($t2)
+    sw $t1, 4($t4)
+
+    addi $t0, $t0, 1
+    j insertion_sort_outer_loop
+
+    insertion_sort_ret:
+    jr $ra
+
 main:
     addi $sp, $sp, -28
     sw $ra, 0($sp)
@@ -119,6 +164,10 @@ main:
     j main_parse_int_loop
 
     main_begin_sort:
+    move $a0, $s2
+    move $a1, $s0
+    jal insertion_sort
+
     move $a0, $s2
     move $a1, $s0
     jal debug_integers
