@@ -9,6 +9,10 @@
   part2: .asciiz ") = "
 
 .text
+  exit:
+    li $v0, 10
+    syscall
+
   # $a0: message to print
   print_msg:
     li $v0, 4
@@ -135,7 +139,7 @@
     add $s0, $s0, $s1
     move $s1, $t0
 
-    add $s2, $s2, -1
+    addi $s2, $s2, -1
     bne $s2, $zero, fib_iterative_loop
 
     fib_iterative_ret:
@@ -216,4 +220,7 @@
     lw $s0, 4($sp)
     lw $ra, 0($sp)
     addi $sp, $sp, 12
-    jr $ra
+    # jr $ra # commented out for dashmips always returns to the beginning
+
+    li $a0, 0
+    jal exit
