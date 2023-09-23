@@ -11,5 +11,4 @@ USER vscode
 ENV PATH "$PATH:/home/vscode/.local/bin"
 RUN python3 -m ensurepip --user \
     && python3 -m pip install --user -U pip setuptools wheel \
-    && python3 -m pip install --user pipx \
-    && pipx install dashmips
+    && python3 -m pip install --user dashmips
