@@ -4,7 +4,9 @@
 name_prompt: .asciiz "What is your name? "
 age_prompt: .asciiz "What is your age? "
 hello: .asciiz "Hello, "
-name: .space 51
+name:
+.align 2  # align name on word boundary
+.space 51
 max_length: .word 50
 age_result_1: .asciiz "You will be "
 age_result_2: .asciiz " years old in four years"
