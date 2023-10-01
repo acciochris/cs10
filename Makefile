@@ -1,4 +1,5 @@
-SHELL=/bin/bash
+SHELL = /bin/bash
+export DISPLAY = :0
 
 %.asm: %.s
 	spim -dump -file $^
@@ -8,3 +9,7 @@ SHELL=/bin/bash
 .PHONY: clean
 clean:
 	find . -name '*.asm' -delete
+
+.PHONY: mars
+mars:
+	bash mars.sh
