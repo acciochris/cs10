@@ -31,7 +31,7 @@ song:
 .byte 62, 80
 .half 500
 .byte 60, 80
-.half 500
+.half 1000
 length: .word 14
 
 .text
