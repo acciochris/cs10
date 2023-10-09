@@ -1,5 +1,5 @@
 # Lab 3 Exercise 1 (Chang Liu)
-# Student ID even => masking and `10X = (8 + 2)X = 8X + 2X`
+# Student ID even => arithmetic and `10X = 2(X + 4X)`
 
 # ASCII for reference
 # | char | dec | hex | bin    |
@@ -8,8 +8,8 @@
 # ...
 # | 9    | 57  | 39  | 111001 |
 #
-# Masking
-# '0' & 0xF (lower four bits)
+# Arithmetic
+# '0' - 48
 
 # syscall reference
 # | service       | $v0 | parameters and/or outputs    |
@@ -149,17 +149,16 @@ parse_vector:
 atoi:
     # upper digit
     lbu $t0, 0($a0)
-    andi $t0, $t0, 0xF
+    addiu $t0, $t0, -48
 
     # 10X
-    sll $t0, $t0, 1 # 2X
-    move $v0, $t0
-    sll $t0, $t0, 2 # 2X * 4 = 8X
-    addu $v0, $v0, $t0
+    sll $v0, $t0, 2    # 4X
+    addu $v0, $v0, $t0 # 4X + X = 5X
+    sll $v0, $v0, 1    # 5x * 2 = 10X
 
     # lower digit
     lbu $t0, 1($a0)
-    andi $t0, $t0, 0xF
+    addiu $t0, $t0, -48
     addu $v0, $v0, $t0
 
     jr $ra
