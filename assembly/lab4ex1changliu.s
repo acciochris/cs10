@@ -225,6 +225,8 @@ multiply_matrix:
 
                 # one row: 4 * 4 = 16 bytes
                 # one element: 4 bytes
+
+                # load
                 sll $t6, $t3, 4
                 sll $t7, $t5, 2
                 addu $t1, $t6, $t7
@@ -237,8 +239,10 @@ multiply_matrix:
                 addu $t2, $t2, $s2
                 lw $t2, 0($t2)
 
+                # multiply
                 mul $t1, $t1, $t2
 
+                # add in place
                 sll $t6, $t3, 4
                 sll $t7, $t4, 2
                 addu $t0, $t6, $t7
