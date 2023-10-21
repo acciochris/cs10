@@ -27,6 +27,7 @@ input_vector: .space 9 # 1*4 (ints) + 1*3 (spaces) + 1 (\0) + 1 (extra buffer)
 prompt_row: .asciiz "Row "
 prompt_row2: .asciiz ": "
 newline: .asciiz "\n"
+space: .asciiz " "
 
 .text
 .globl main
@@ -41,10 +42,18 @@ main:
     la $a0, M2
     jal read_matrix
 
+    # multiply
     la $a0, M3
     la $a1, M1
     la $a2, M2
     jal multiply_matrix
+
+    # print
+    la $a0, newline
+    jal _print_str
+
+    la $a0, M3
+    jal print_matrix
 
     # exit
     li $v0, 10
@@ -113,6 +122,71 @@ read_matrix:
 
     jr $ra
 
+# parameters:
+# $a0: (int *) pointer to matrix
+print_matrix:
+    addiu $sp, $sp, -24
+    sw $ra, 0($sp)
+    sw $s0, 4($sp)
+    sw $s1, 8($sp)
+    sw $s2, 12($sp)
+    sw $s3, 16($sp)
+    sw $s4, 20($sp)
+
+    li $s0, 4
+    move $s2, $a0
+
+    print_matrix_loop:
+        la $a0, prompt_row
+        jal _print_str
+
+        # print row index
+        li $s1, 5
+        sub $s1, $s1, $s0
+        move $a0, $s1
+        jal _print_int
+
+        la $a0, prompt_row2
+        jal _print_str
+
+        # calculate array offset
+        addiu $t0, $s1, -1 # row 1 => offset 0
+        sll $t0, $t0, 4    # 4 words = 16 bytes = 2^4
+        addu $s3, $s2, $t0
+
+        # print first integer
+        lw $a0, 0($s3)
+        jal _print_int
+
+        # print rest with spaces
+        li $s4, 3
+        print_matrix_inner_loop:
+            la $a0, space
+            jal _print_str
+
+            addiu $s3, $s3, 4
+            lw $a0, 0($s3)
+            jal _print_int
+
+            addiu $s4, $s4, -1
+            bne $s4, $zero, print_matrix_inner_loop
+
+        # print newline
+        la $a0, newline
+        jal _print_str
+
+        addiu $s0, $s0, -1
+        bne $s0, $zero, print_matrix_loop
+
+    lw $s4, 20($sp)
+    lw $s3, 16($sp)
+    lw $s2, 12($sp)
+    lw $s1, 8($sp)
+    lw $s0, 4($sp)
+    lw $ra, 0($sp)
+    addiu $sp, $sp, 24
+
+    jr $ra
 
 # parameters:
 # $a0: (int *) pointer to result matrix
