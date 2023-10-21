@@ -41,6 +41,11 @@ main:
     la $a0, M2
     jal read_matrix
 
+    la $a0, M3
+    la $a1, M1
+    la $a2, M2
+    jal multiply_matrix
+
     # exit
     li $v0, 10
     syscall
@@ -62,7 +67,7 @@ _print_str:
 # parameters:
 # $a0: (int *) pointer to where the integers should be stored
 read_matrix:
-    addi $sp, $sp, -16
+    addiu $sp, $sp, -16
     sw $ra, 0($sp)
     sw $s0, 4($sp)
     sw $s1, 8($sp)
@@ -104,7 +109,81 @@ read_matrix:
     lw $s1, 8($sp)
     lw $s0, 4($sp)
     lw $ra, 0($sp)
-    addi $sp, $sp, 16
+    addiu $sp, $sp, 16
+
+    jr $ra
+
+
+# parameters:
+# $a0: (int *) pointer to result matrix
+# $a1: (int *) pointer to first matrix
+# $a2: (int *) pointer to second matrix
+multiply_matrix:
+    addiu $sp, $sp, -12
+    sw $s0, 0($sp)
+    sw $s1, 4($sp)
+    sw $s2, 8($sp)
+
+    # pseudo-code
+    # for (int i = 0; i < 4; ++i) {
+    #   for (int j = 0; j < 4; ++j) {
+    #     for (int k = 0; k < 4; ++k) {
+    #       $a0[i][j] += $a1[i][k] * $a2[k][j];
+    #     }
+    #   }
+    # }
+    move $s0, $a0
+    move $s1, $a1
+    move $s2, $a2
+
+    li $t3, 4
+
+    multiply_matrix_loop1:
+        addiu $t3, $t3, -1
+        li $t4, 4
+
+        multiply_matrix_loop2:
+            addiu $t4, $t4, -1
+            li $t5, 4
+
+            multiply_matrix_loop3:
+                addiu $t5, $t5, -1
+
+                # one row: 4 * 4 = 16 bytes
+                # one element: 4 bytes
+                sll $t6, $t3, 4
+                sll $t7, $t5, 2
+                addu $t1, $t6, $t7
+                addu $t1, $t1, $s1
+                lw $t1, 0($t1)
+
+                sll $t6, $t5, 4
+                sll $t7, $t4, 2
+                addu $t2, $t6, $t7
+                addu $t2, $t2, $s2
+                lw $t2, 0($t2)
+
+                mul $t1, $t1, $t2
+
+                sll $t6, $t3, 4
+                sll $t7, $t4, 2
+                addu $t0, $t6, $t7
+                addu $t0, $t0, $s0
+                lw $t2, 0($t0)
+
+                addu $t2, $t2, $t1
+                sw $t2, 0($t0)
+
+                bne $t5, $zero, multiply_matrix_loop3
+
+            bne $t4, $zero, multiply_matrix_loop2
+
+        bne $t3, $zero, multiply_matrix_loop1
+
+    lw $s2, 8($sp)
+    lw $s1, 4($sp)
+    lw $s0, 0($sp)
+    addiu $sp, $sp, 12
 
     jr $ra
 
@@ -136,6 +215,7 @@ parse_vector:
     lw $s0, 4($sp)
     lw $ra, 0($sp)
     addiu $sp, $sp, 16
+
     jr $ra
 
 # parameters:
