@@ -220,39 +220,56 @@ multiply_matrix:
             addiu $t4, $t4, -1
             li $t5, 4
 
-            multiply_matrix_loop3:
-                addiu $t5, $t5, -1
+            # load result
+            sll $t6, $t3, 4
+            sll $t7, $t4, 2
+            addu $t0, $t6, $t7
+            addu $t0, $t0, $s0
+            lw $a0, 0($t0)
 
+            multiply_matrix_loop3_unroll2:
                 # one row: 4 * 4 = 16 bytes
                 # one element: 4 bytes
 
-                # load
+                # load 1
+                addiu $t5, $t5, -1
                 sll $t6, $t3, 4
                 sll $t7, $t5, 2
-                addu $t1, $t6, $t7
-                addu $t1, $t1, $s1
-                lw $t1, 0($t1)
+                addu $t6, $t6, $t7
+                addu $t6, $t6, $s1
+                lw $t1, 0($t6)
 
                 sll $t6, $t5, 4
                 sll $t7, $t4, 2
-                addu $t2, $t6, $t7
-                addu $t2, $t2, $s2
-                lw $t2, 0($t2)
+                addu $t7, $t6, $t7
+                addu $t7, $t7, $s2
+                lw $t2, 0($t7)
+
+                # load 2
+                addiu $t5, $t5, -1
+                sll $t6, $t3, 4
+                sll $t7, $t5, 2
+                addu $t6, $t6, $t7
+                addu $t6, $t6, $s1
+                lw $a1, 0($t6)
+
+                sll $t6, $t5, 4
+                sll $t7, $t4, 2
+                addu $t7, $t6, $t7
+                addu $t7, $t7, $s2
+                lw $a2, 0($t7)
 
                 # multiply
                 mul $t1, $t1, $t2
+                mul $a1, $a1, $a2
 
-                # add in place
-                sll $t6, $t3, 4
-                sll $t7, $t4, 2
-                addu $t0, $t6, $t7
-                addu $t0, $t0, $s0
-                lw $t2, 0($t0)
+                # add
+                addu $t1, $t1, $a1
+                addu $a0, $a0, $t1
 
-                addu $t2, $t2, $t1
-                sw $t2, 0($t0)
+                bne $t5, $zero, multiply_matrix_loop3_unroll2
 
-                bne $t5, $zero, multiply_matrix_loop3
+            sw $a0, 0($t0)
 
             bne $t4, $zero, multiply_matrix_loop2
 
