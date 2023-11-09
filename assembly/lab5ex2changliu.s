@@ -220,39 +220,71 @@ multiply_matrix:
             addiu $t4, $t4, -1
             li $t5, 4
 
-            multiply_matrix_loop3:
-                addiu $t5, $t5, -1
+            # compute result address
+            sll $t6, $t3, 4
+            sll $t7, $t4, 2
+            addu $t0, $t6, $t7
+            addu $t0, $t0, $s0
+            move $a0, $zero
 
-                # one row: 4 * 4 = 16 bytes
-                # one element: 4 bytes
+            # one row: 4 * 4 = 16 bytes
+            # one element: 4 bytes
 
-                # load
-                sll $t6, $t3, 4
-                sll $t7, $t5, 2
-                addu $t1, $t6, $t7
-                addu $t1, $t1, $s1
-                lw $t1, 0($t1)
+            # load 1
+            sll $t6, $t3, 4
+            addiu $t6, $t6, 12
+            addu $t6, $t6, $s1
+            lw $t6, 0($t6)
 
-                sll $t6, $t5, 4
-                sll $t7, $t4, 2
-                addu $t2, $t6, $t7
-                addu $t2, $t2, $s2
-                lw $t2, 0($t2)
+            sll $t7, $t4, 2
+            addiu $t7, $t7, 48
+            addu $t7, $t7, $s2
+            lw $t7, 0($t7)
 
-                # multiply
-                mul $t1, $t1, $t2
+            # load 2
+            sll $a3, $t3, 4
+            addiu $a3, $a3, 8
+            addu $a3, $a3, $s1
+            lw $a3, 0($a3)
 
-                # add in place
-                sll $t6, $t3, 4
-                sll $t7, $t4, 2
-                addu $t0, $t6, $t7
-                addu $t0, $t0, $s0
-                lw $t2, 0($t0)
+            sll $v0, $t4, 2
+            addiu $v0, $v0, 32
+            addu $v0, $v0, $s2
+            lw $v0, 0($v0)
 
-                addu $t2, $t2, $t1
-                sw $t2, 0($t0)
+            # load 3
+            sll $v1, $t3, 4
+            addiu $v1, $v1, 4
+            addu $v1, $v1, $s1
+            lw $v1, 0($v1)
 
-                bne $t5, $zero, multiply_matrix_loop3
+            sll $t5, $t4, 2
+            addiu $t5, $t5, 16
+            addu $t5, $t5, $s2
+            lw $t5, 0($t5)
+
+            # load 4
+            sll $t1, $t3, 4
+            addu $t1, $t1, $s1
+            lw $t1, 0($t1)
+
+            sll $t2, $t4, 2
+            addu $t2, $t2, $s2
+            lw $t2, 0($t2)
+
+            # multiply and add
+            mul $t6, $t6, $t7
+            mul $a3, $a3, $v0
+            mul $v1, $v1, $t5
+            mul $t1, $t1, $t2
+
+            # add
+            addu $t6, $t6, $a3
+            addu $v1, $v1, $t1
+            addu $t6, $t6, $v1
+            addu $a0, $a0, $t6
+
+            sw $a0, 0($t0)
 
             bne $t4, $zero, multiply_matrix_loop2
 
