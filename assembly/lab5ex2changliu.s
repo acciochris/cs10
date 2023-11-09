@@ -1,4 +1,4 @@
-# Lab 4 Exercise 1 (Chang Liu)
+# Lab 5 Exercise 2 (Chang Liu)
 # Student ID even => arithmetic
 
 # ASCII for reference
@@ -17,6 +17,21 @@
 # | print string  | 4   | $a0: string                  |
 # | read string   | 8   | $a0: buffer, $a1: max_length |
 # | read integer  | 5   | $v0: integer                 |
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+# Answers to evaluation questions are HERE #
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+
+# Program length: In the fully unrolled version, the program length is significantly
+#                 larger.
+# Register usage: If no other optimization is used, register usage is extremely high
+#                 and there were not enough registers. However, as the loop counter is
+#                 completely unnecessary at this point, we can directly substitute the
+#                 variables with constants, dramatically reducing register usage to
+#                 about the same level as the unrolled-once version.
+# Conceptual complexity: The conceptual complexity in implementing this fully-unrolled
+#                        version is mostly in the form of wrapping one's mind around
+#                        the different registers and replacing variables with known constants.
 
 .data
 .align 2
@@ -217,6 +232,8 @@ multiply_matrix:
         li $t4, 4
 
         multiply_matrix_loop2:
+            # NOTE: The comments on program length, etc. are at the beginning
+            #       of the file.
             addiu $t4, $t4, -1
             li $t5, 4
 

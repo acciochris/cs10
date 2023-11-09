@@ -1,4 +1,4 @@
-# Lab 4 Exercise 1 (Chang Liu)
+# Lab 5 Exercise 1 (Chang Liu)
 # Student ID even => arithmetic
 
 # ASCII for reference
@@ -17,6 +17,18 @@
 # | print string  | 4   | $a0: string                  |
 # | read string   | 8   | $a0: buffer, $a1: max_length |
 # | read integer  | 5   | $v0: integer                 |
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+# Answers to evaluation questions are HERE #
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+
+# Program length: If the loop is only unrolled once, the program length is only
+#                 slightly larger than the original version.
+# Register usage: As the loop is not fully unrolled, the loop counter must still
+#                 exist. Combined with the new registers for the unrolled code,
+#                 Register pressure is quite high.
+# Conceptual complexity: Conceptual complexity is reasonable. In most cases, only
+#                        register names need to be changed.
 
 .data
 .align 2
@@ -228,6 +240,8 @@ multiply_matrix:
             move $a0, $zero
 
             multiply_matrix_loop3_unroll2:
+                # NOTE: The comments on program length, etc. are at the beginning
+                #       of the file.
                 # one row: 4 * 4 = 16 bytes
                 # one element: 4 bytes
 
