@@ -220,12 +220,12 @@ multiply_matrix:
             addiu $t4, $t4, -1
             li $t5, 4
 
-            # load result
+            # compute result address
             sll $t6, $t3, 4
             sll $t7, $t4, 2
             addu $t0, $t6, $t7
             addu $t0, $t0, $s0
-            lw $a0, 0($t0)
+            move $a0, $zero
 
             multiply_matrix_loop3_unroll2:
                 # one row: 4 * 4 = 16 bytes
