@@ -289,7 +289,7 @@ multiply_matrix:
             addu $t2, $t2, $s2
             lw $t2, 0($t2)
 
-            # multiply and add
+            # multiply
             mul $t6, $t6, $t7
             mul $a3, $a3, $v0
             mul $v1, $v1, $t5
