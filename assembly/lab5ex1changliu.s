@@ -247,17 +247,17 @@ multiply_matrix:
 
                 # load 2
                 addiu $t5, $t5, -1
-                sll $t6, $t3, 4
-                sll $t7, $t5, 2
-                addu $t6, $t6, $t7
-                addu $t6, $t6, $s1
-                lw $a1, 0($t6)
+                sll $a3, $t3, 4
+                sll $v0, $t5, 2
+                addu $a3, $a3, $v0
+                addu $a3, $a3, $s1
+                lw $a1, 0($a3)
 
-                sll $t6, $t5, 4
-                sll $t7, $t4, 2
-                addu $t7, $t6, $t7
-                addu $t7, $t7, $s2
-                lw $a2, 0($t7)
+                sll $a3, $t5, 4
+                sll $v0, $t4, 2
+                addu $v0, $a3, $v0
+                addu $v0, $v0, $s2
+                lw $a2, 0($v0)
 
                 # multiply
                 mul $t1, $t1, $t2
