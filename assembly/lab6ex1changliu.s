@@ -156,9 +156,9 @@ multiply_matrix:
     sw $s2, 8($sp)
 
     # pseudo-code
-    # for (int i = 0; i < 4; ++i) {
-    #   for (int j = 0; j < 4; ++j) {
-    #     for (int k = 0; k < 4; ++k) {
+    # for (int i = 0; i < 8; ++i) {
+    #   for (int j = 0; j < 8; ++j) {
+    #     for (int k = 0; k < 8; ++k) {
     #       $a0[i][j] += $a1[i][k] * $a2[k][j];
     #     }
     #   }
