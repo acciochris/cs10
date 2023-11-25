@@ -1,4 +1,4 @@
-# Lab 4 Exercise 1 (Chang Liu)
+# Lab 6 Exercise 1 (Chang Liu)
 # Student ID even => arithmetic
 
 # ASCII for reference
