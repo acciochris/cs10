@@ -149,35 +149,41 @@ print_matrix:
 # $a0: (int *) pointer to result matrix
 # $a1: (int *) pointer to first matrix
 # $a2: (int *) pointer to second matrix
-multiply_matrix:
-    addiu $sp, $sp, -12
+# $a3: (int) starting index i
+# *($sp): (int) starting index j
+# *($sp + 4): (int) starting index k
+multiply_block:
+    lw $s4, 0($sp)  # j
+    lw $s5, 4($sp)  # k
+
+    addiu $sp, $sp, -24
     sw $s0, 0($sp)
     sw $s1, 4($sp)
     sw $s2, 8($sp)
+    sw $s3, 12($sp)
+    sw $s4, 16($sp)
+    sw $s5, 20($sp)
 
-    # pseudo-code
-    # for (int i = 0; i < 8; ++i) {
-    #   for (int j = 0; j < 8; ++j) {
-    #     for (int k = 0; k < 8; ++k) {
-    #       $a0[i][j] += $a1[i][k] * $a2[k][j];
-    #     }
-    #   }
-    # }
     move $s0, $a0
     move $s1, $a1
     move $s2, $a2
+    move $s3, $a3  # i
 
-    li $t3, 8
+    # bounds (block size 4)
+    addiu $a0, $s3, -4
+    addiu $a1, $s4, -4
+    addiu $a2, $s5, -4
 
-    multiply_matrix_loop1:
+    move $t3, $s3
+    multiply_block_loop1:
         addiu $t3, $t3, -1
-        li $t4, 8
+        move $t4, $s4
 
-        multiply_matrix_loop2:
+        multiply_block_loop2:
             addiu $t4, $t4, -1
-            li $t5, 8
-
-            multiply_matrix_loop3:
+            move $t5, $s5
+            
+            multiply_block_loop3:
                 addiu $t5, $t5, -1
 
                 # one row: 4 * 8 = 32 bytes
@@ -209,15 +215,77 @@ multiply_matrix:
                 addu $t2, $t2, $t1
                 sw $t2, 0($t0)
 
-                bne $t5, $zero, multiply_matrix_loop3
+                bne $t5, $a2, multiply_block_loop3
 
-            bne $t4, $zero, multiply_matrix_loop2
+            bne $t4, $a1, multiply_block_loop2
 
-        bne $t3, $zero, multiply_matrix_loop1
+        bne $t3, $a0, multiply_block_loop1
 
+    lw $s5, 20($sp)
+    lw $s4, 16($sp)
+    lw $s3, 12($sp)
     lw $s2, 8($sp)
     lw $s1, 4($sp)
     lw $s0, 0($sp)
-    addiu $sp, $sp, 12
+    addiu $sp, $sp, 24
 
     jr $ra
+
+# parameters:
+# $a0: (int *) pointer to result matrix
+# $a1: (int *) pointer to first matrix
+# $a2: (int *) pointer to second matrix
+multiply_matrix:
+    addiu $sp, $sp, -24
+    sw $s0, 0($sp)
+    sw $s1, 4($sp)
+    sw $s2, 8($sp)
+    sw $s3, 12($sp)
+    sw $s4, 16($sp)
+    sw $s5, 20($sp)
+
+    move $s0, $a0
+    move $s1, $a1
+    move $s2, $a2
+
+    li $s3, 2  # i, 8 / 4 = 2
+    
+    multiply_matrix_loop1:
+        li $s4, 2  # j
+
+        multiply_matrix_loop2:
+            li $s5, 2  # k
+
+            multiply_matrix_loop3:
+                move $a0, $s0
+                move $a1, $s1
+                move $a2, $s2
+                sll $a3, $s3, 2  # block size 4 = 2^2
+                
+                # extra araguments on stack
+                addiu $sp, $sp, -8
+                sll $t0, $s4, 2
+                sw $t0, 0($sp)
+                sll $t1, $s5, 2
+                sw $t1, 4($sp)
+
+                jal multiply_block
+
+                addiu $sp, $sp, 8
+
+                addiu $s5, $s5, -1
+                bne $s5, $zero, multiply_matrix_loop3
+            
+            addiu $s4, $s4, -1
+            bne $s4, $zero, multiply_matrix_loop2
+        
+        addiu $s3, $s3, -1
+        bne $s3, $zero, multiply_matrix_loop1
+
+    lw $s5, 20($sp)
+    lw $s4, 16($sp)
+    lw $s3, 12($sp)
+    lw $s2, 8($sp)
+    lw $s1, 4($sp)
+    lw $s0, 0($sp)
+    addiu $sp, $sp, 24
