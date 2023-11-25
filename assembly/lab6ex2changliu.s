@@ -153,8 +153,8 @@ print_matrix:
 # *($sp): (int) starting index j
 # *($sp + 4): (int) starting index k
 multiply_block:
-    lw $s4, 0($sp)  # j
-    lw $s5, 4($sp)  # k
+    lw $t4, 0($sp)
+    lw $t5, 4($sp)
 
     addiu $sp, $sp, -24
     sw $s0, 0($sp)
@@ -168,6 +168,8 @@ multiply_block:
     move $s1, $a1
     move $s2, $a2
     move $s3, $a3  # i
+    move $s4, $t4  # j
+    move $s5, $t5  # k
 
     # bounds (block size 4)
     addiu $a0, $s3, -4
@@ -236,13 +238,14 @@ multiply_block:
 # $a1: (int *) pointer to first matrix
 # $a2: (int *) pointer to second matrix
 multiply_matrix:
-    addiu $sp, $sp, -24
-    sw $s0, 0($sp)
-    sw $s1, 4($sp)
-    sw $s2, 8($sp)
-    sw $s3, 12($sp)
-    sw $s4, 16($sp)
-    sw $s5, 20($sp)
+    addiu $sp, $sp, -28
+    sw $ra, 0($sp)
+    sw $s0, 4($sp)
+    sw $s1, 8($sp)
+    sw $s2, 12($sp)
+    sw $s3, 16($sp)
+    sw $s4, 20($sp)
+    sw $s5, 24($sp)
 
     move $s0, $a0
     move $s1, $a1
@@ -282,10 +285,13 @@ multiply_matrix:
         addiu $s3, $s3, -1
         bne $s3, $zero, multiply_matrix_loop1
 
-    lw $s5, 20($sp)
-    lw $s4, 16($sp)
-    lw $s3, 12($sp)
-    lw $s2, 8($sp)
-    lw $s1, 4($sp)
-    lw $s0, 0($sp)
-    addiu $sp, $sp, 24
+    lw $s5, 24($sp)
+    lw $s4, 20($sp)
+    lw $s3, 16($sp)
+    lw $s2, 12($sp)
+    lw $s1, 8($sp)
+    lw $s0, 4($sp)
+    lw $ra, 0($sp)
+    addiu $sp, $sp, 28
+
+    jr $ra
