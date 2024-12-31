@@ -5,7 +5,7 @@ yes $(pwgen 8 1 | tee passwd) | vncpasswd
 
 # Get Mars jar
 if [ ! -f ./Mars4_5.jar ]; then
-    wget https://courses.missouristate.edu/KenVollmar/mars/MARS_4_5_Aug2014/Mars4_5.jar
+    wget https://dpetersanderson.github.io/Mars4_5.jar
 fi
 
 # Run server
